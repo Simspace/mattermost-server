@@ -43,6 +43,7 @@ const (
 	SERVICE_GITLAB    = "gitlab"
 	SERVICE_GOOGLE    = "google"
 	SERVICE_OFFICE365 = "office365"
+	SERVICE_KEYCLOAK  = "keycloak"
 
 	GENERIC_NO_CHANNEL_NOTIFICATION = "generic_no_channel"
 	GENERIC_NOTIFICATION            = "generic"
@@ -2244,6 +2245,7 @@ type Config struct {
 	GoogleSettings        SSOSettings
 	Office365Settings     SSOSettings
 	LdapSettings          LdapSettings
+	KeycloakSettings      SSOSettings
 	ComplianceSettings    ComplianceSettings
 	LocalizationSettings  LocalizationSettings
 	SamlSettings          SamlSettings
@@ -2282,6 +2284,8 @@ func (o *Config) GetSSOService(service string) *SSOSettings {
 		return &o.GoogleSettings
 	case SERVICE_OFFICE365:
 		return &o.Office365Settings
+	case SERVICE_KEYCLOAK:
+		return &o.KeycloakSettings
 	}
 
 	return nil
@@ -2311,6 +2315,7 @@ func (o *Config) SetDefaults() {
 	o.PrivacySettings.setDefaults()
 	o.Office365Settings.setDefaults()
 	o.GitLabSettings.setDefaults()
+	o.KeycloakSettings.setDefaults()
 	o.GoogleSettings.setDefaults()
 	o.ServiceSettings.SetDefaults()
 	o.PasswordSettings.SetDefaults()
@@ -2863,6 +2868,9 @@ func (o *Config) Sanitize() {
 
 	if len(*o.GitLabSettings.Secret) > 0 {
 		*o.GitLabSettings.Secret = FAKE_SETTING
+	}
+	if len(*o.KeycloakSettings.Secret) > 0 {
+		*o.KeycloakSettings.Secret = FAKE_SETTING
 	}
 
 	*o.SqlSettings.DataSource = FAKE_SETTING

@@ -265,6 +265,15 @@
         "TokenEndpoint": "https://login.microsoftonline.com/common/oauth2/v2.0/token",
         "UserApiEndpoint": "https://graph.microsoft.com/v1.0/me"
     },
+    "KeycloakSettings": {
+        "Enable": false,
+        "Secret": "",
+        "Id": "",
+        "Scope": "",
+        "AuthEndpoint": "",
+        "TokenEndpoint": "",
+        "UserApiEndpoint": ""
+    },
     "LdapSettings": {
         "Enable": false,
         "EnableSync": false,
