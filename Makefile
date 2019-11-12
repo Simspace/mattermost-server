@@ -1,4 +1,4 @@
-.PHONY: build package run stop run-client run-server stop-client stop-server restart restart-server restart-client start-docker clean-dist clean nuke check-style check-client-style check-server-style check-unit-tests test dist setup-mac prepare-enteprise run-client-tests setup-run-client-tests cleanup-run-client-tests test-client build-linux build-osx build-windows internal-test-web-client vet run-server-for-web-client-tests
+.PHONY: build package run stop run-client run-server stop-client stop-server restart restart-server restart-client start-docker clean-dist clean nuke check-style check-client-style check-server-style check-unit-tests test dist setup-mac prepare-enteprise run-client-tests setup-run-client-tests cleanup-run-client-tests test-client build-linux build-osx build-windows internal-test-web-client vet run-server-for-web-client-tests docker-preview
 
 ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
@@ -578,3 +578,8 @@ endif
 ## Help documentatin à la https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' ./Makefile | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
+docker-preview:
+	rm -f docker-preview/mattermost-team-linux-amd64.tar.gz
+	cp ./dist/mattermost-team-linux-amd64.tar.gz docker-preview/.
+	cd ./docker-preview && docker build -t simspace/mattermost-preview:5.11.0 .
