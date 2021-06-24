@@ -92,22 +92,23 @@ func (m *OpenIdProvider) GetSSOSettings(config *model.Config, service string) (*
 	req, err := http.NewRequest("GET", *config.OpenIdSettings.DiscoveryEndpoint, nil)
 	if err != nil {
 		mlog.Warn("Error while making discovery request", mlog.Err(err))
+		return nil, err
 	}
 
 	req.Header.Set("Accept", "application/json")
 	resp, err2 := h.MakeClient(true).Do(req)
 	if err2 != nil {
 		mlog.Warn("Error while fetching discovery request", mlog.Err(err2))
+		return nil, err2
 	}
 
 	defer resp.Body.Close()
 
 	var oidcUrls OpenIdProviderUrls
-	json.NewDecoder(resp.Body).Decode(&oidcUrls)
-
-	_, err3 := json.Marshal(oidcUrls)
+	err3 := json.NewDecoder(resp.Body).Decode(&oidcUrls)
 	if err3 != nil {
 		mlog.Warn("Error while deserializing discovery response", mlog.Err(err3))
+		return nil, err3
 	}
 
 	// Merge the 'discovered' endpoints with the original settings
