@@ -25,11 +25,12 @@ type OpenIdProviderUrls struct {
 
 // Keycloak sepcific
 type OpenIdUser struct {
-	Id        string `json:"sub"`
-	Username  string `json:"preferred_username"`
-	Email     string `json:"email"`
-	FirstName string `json:"given_name"`
-	LastName  string `json:"family_name"`
+	Id        string   `json:"sub"`
+	Username  string   `json:"preferred_username"`
+	Email     string   `json:"email"`
+	FirstName string   `json:"given_name"`
+	LastName  string   `json:"family_name"`
+	Roles     []string `json:"roles"`
 }
 
 func init() {
@@ -47,6 +48,15 @@ func userFromOpenIdUser(oiu *OpenIdUser) *model.User {
 	user.Email = strings.ToLower(user.Email)
 	user.AuthData = model.NewString(oiu.getAuthData())
 	user.AuthService = model.SERVICE_OPENID
+	var roles string
+	for _, r := range oiu.Roles {
+		if r == "mattermost_admins" {
+			roles = model.SYSTEM_ADMIN_ROLE_ID
+		} else {
+			mlog.Debug("Skipping unknown role when processing user: " + username + " role: " + r)
+		}
+	}
+	user.Roles = roles
 
 	return user
 }
