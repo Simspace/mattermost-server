@@ -85,7 +85,7 @@ func (oiu *OpenIdUser) ToJson() string {
 
 
 func (oiu *OpenIdUser) getAuthData() string {
-	return oiu.Id
+	return oiu.Email
 }
 
 func (m *OpenIdProvider) GetUserFromJson(data io.Reader, tokenUser *model.User) (*model.User, error) {
