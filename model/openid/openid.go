@@ -48,10 +48,11 @@ func userFromOpenIdUser(oiu *OpenIdUser) *model.User {
 	user.Email = strings.ToLower(user.Email)
 	user.AuthData = model.NewString(oiu.getAuthData())
 	user.AuthService = model.SERVICE_OPENID
-	roles := model.SYSTEM_USER_ROLE_ID
+	var roles string
+	roles = model.SYSTEM_USER_ROLE_ID
 	for _, r := range oiu.Roles {
 		if r == "mattermost_admins" {
-			roles += " " + model.SYSTEM_ADMIN_ROLE_ID
+			roles = model.SYSTEM_USER_ROLE_ID+" "+model.SYSTEM_ADMIN_ROLE_ID
 		} else {
 			mlog.Debug("Skipping unknown role when processing user: " + username + " role: " + r)
 		}
