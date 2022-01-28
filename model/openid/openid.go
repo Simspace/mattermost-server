@@ -25,7 +25,7 @@ type OpenIdProviderUrls struct {
 
 // Keycloak sepcific
 type OpenIdUser struct {
-	Id        string   `json:"sub"`
+	Id        string   `json:"uniqueId"`
 	Username  string   `json:"preferred_username"`
 	Email     string   `json:"email"`
 	FirstName string   `json:"given_name"`
@@ -86,7 +86,7 @@ func (oiu *OpenIdUser) ToJson() string {
 
 
 func (oiu *OpenIdUser) getAuthData() string {
-	return oiu.Email
+	return oiu.Id
 }
 
 func (m *OpenIdProvider) GetUserFromJson(data io.Reader, tokenUser *model.User) (*model.User, error) {
@@ -143,5 +143,8 @@ func (m *OpenIdProvider) GetUserFromIdToken(idToken string) (*model.User, error)
 }
 
 func (m *OpenIdProvider) IsSameUser(dbUser, oauthUser *model.User) bool {
-	return dbUser.AuthData == oauthUser.AuthData
+	// PCTE converted from emails as unique to SSO ID as unique
+	// so check IDs first (which will be in authData), then check email
+	return dbUser.AuthData == oauthUser.AuthData ||
+		dbUser.Email == oauthUser.Email
 }
