@@ -58,6 +58,7 @@ func userFromOpenIdUser(oiu *OpenIdUser) *model.User {
 		}
 	}
 	user.Roles = roles
+	mlog.Debug("Parsed user from openId as model user: " + user.ToJson())
 
 	return user
 }
@@ -145,6 +146,6 @@ func (m *OpenIdProvider) GetUserFromIdToken(idToken string) (*model.User, error)
 func (m *OpenIdProvider) IsSameUser(dbUser, oauthUser *model.User) bool {
 	// PCTE converted from emails as unique to SSO ID as unique
 	// so check IDs first (which will be in authData), then check email
-	return dbUser.AuthData == oauthUser.AuthData ||
+	return *dbUser.AuthData == *oauthUser.AuthData ||
 		dbUser.Email == oauthUser.Email
 }
