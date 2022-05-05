@@ -8980,22 +8980,6 @@ func (s *TimerLayerUserStore) GetRecentlyActiveUsersForTeam(teamID string, offse
 	return result, err
 }
 
-func (s *TimerLayerUserStore) GetSystemAdminProfiles() (map[string]*model.User, error) {
-	start := timemodule.Now()
-
-	result, err := s.UserStore.GetSystemAdminProfiles()
-
-	elapsed := float64(timemodule.Since(start)) / float64(timemodule.Second)
-	if s.Root.Metrics != nil {
-		success := "false"
-		if err == nil {
-			success = "true"
-		}
-		s.Root.Metrics.ObserveStoreMethodDuration("UserStore.GetSystemAdminProfiles", success, elapsed)
-	}
-	return result, err
-}
-
 func (s *TimerLayerUserStore) GetTeamGroupUsers(teamID string) ([]*model.User, error) {
 	start := timemodule.Now()
 

@@ -711,9 +711,6 @@ func maxInt(a, b int) int {
 
 func (s *Server) runJobs() {
 	s.Go(func() {
-		runSecurityJob(s)
-	})
-	s.Go(func() {
 		firstRun, err := s.getFirstServerRunTimestamp()
 		if err != nil {
 			mlog.Warn("Fetching time of first server run failed. Setting to 'now'.")
@@ -1410,13 +1407,6 @@ func (s *Server) checkPushNotificationServerUrl() {
 	}
 }
 
-func runSecurityJob(s *Server) {
-	doSecurity(s)
-	model.CreateRecurringTask("Security", func() {
-		doSecurity(s)
-	}, time.Hour*4)
-}
-
 func runTokenCleanupJob(s *Server) {
 	doTokenCleanup(s)
 	model.CreateRecurringTask("Token Cleanup", func() {
@@ -1476,10 +1466,6 @@ func runCheckAdminSupportStatusJob(a *App, c *request.Context) {
 	model.CreateRecurringTask("Check Admin Support Status Job", func() {
 		doCheckAdminSupportStatus(a, c)
 	}, time.Hour*model.WARN_METRIC_JOB_INTERVAL)
-}
-
-func doSecurity(s *Server) {
-	s.DoSecurityUpdateCheck()
 }
 
 func doTokenCleanup(s *Server) {
@@ -1764,28 +1750,6 @@ func (s *Server) doLicenseExpirationCheck() {
 	if !license.IsPastGracePeriod() {
 		mlog.Debug("License is not past the grace period.")
 		return
-	}
-
-	users, err := s.Store.User().GetSystemAdminProfiles()
-	if err != nil {
-		mlog.Error("Failed to get system admins for license expired message from Mattermost.")
-		return
-	}
-
-	//send email to admin(s)
-	for _, user := range users {
-		user := user
-		if user.Email == "" {
-			mlog.Error("Invalid system admin email.", mlog.String("user_email", user.Email))
-			continue
-		}
-
-		mlog.Debug("Sending license expired email.", mlog.String("user_email", user.Email))
-		s.Go(func() {
-			if err := s.EmailService.SendRemoveExpiredLicenseEmail(user.Email, user.Locale, *s.Config().ServiceSettings.SiteURL); err != nil {
-				mlog.Error("Error while sending the license expired email.", mlog.String("user_email", user.Email), mlog.Err(err))
-			}
-		})
 	}
 
 	//remove the license
