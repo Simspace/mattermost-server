@@ -1046,31 +1046,6 @@ func (us SqlUserStore) GetProfileByGroupChannelIdsForUser(userId string, channel
 	return usersByChannelId, nil
 }
 
-func (us SqlUserStore) GetSystemAdminProfiles() (map[string]*model.User, error) {
-	query := us.usersQuery.
-		Where("Roles LIKE ?", "%system_admin%").
-		OrderBy("u.Username ASC")
-
-	queryString, args, err := query.ToSql()
-	if err != nil {
-		return nil, errors.Wrap(err, "get_system_admin_profiles_tosql")
-	}
-
-	var users []*model.User
-	if _, err := us.GetReplica().Select(&users, queryString, args...); err != nil {
-		return nil, errors.Wrap(err, "failed to find Users")
-	}
-
-	userMap := make(map[string]*model.User)
-
-	for _, u := range users {
-		u.Sanitize(map[string]bool{})
-		userMap[u.Id] = u
-	}
-
-	return userMap, nil
-}
-
 func (us SqlUserStore) GetByEmail(email string) (*model.User, error) {
 	query := us.usersQuery.Where("Email = lower(?)", email)
 

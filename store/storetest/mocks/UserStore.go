@@ -891,29 +891,6 @@ func (_m *UserStore) GetRecentlyActiveUsersForTeam(teamID string, offset int, li
 	return r0, r1
 }
 
-// GetSystemAdminProfiles provides a mock function with given fields:
-func (_m *UserStore) GetSystemAdminProfiles() (map[string]*model.User, error) {
-	ret := _m.Called()
-
-	var r0 map[string]*model.User
-	if rf, ok := ret.Get(0).(func() map[string]*model.User); ok {
-		r0 = rf()
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(map[string]*model.User)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func() error); ok {
-		r1 = rf()
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
 // GetTeamGroupUsers provides a mock function with given fields: teamID
 func (_m *UserStore) GetTeamGroupUsers(teamID string) ([]*model.User, error) {
 	ret := _m.Called(teamID)

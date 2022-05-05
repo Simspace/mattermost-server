@@ -59,7 +59,6 @@ func TestUserStore(t *testing.T, ss store.Store, s SqlStore) {
 	t.Run("GetProfilesByIds", func(t *testing.T) { testUserStoreGetProfilesByIds(t, ss) })
 	t.Run("GetProfileByGroupChannelIdsForUser", func(t *testing.T) { testUserStoreGetProfileByGroupChannelIdsForUser(t, ss) })
 	t.Run("GetProfilesByUsernames", func(t *testing.T) { testUserStoreGetProfilesByUsernames(t, ss) })
-	t.Run("GetSystemAdminProfiles", func(t *testing.T) { testUserStoreGetSystemAdminProfiles(t, ss) })
 	t.Run("GetByEmail", func(t *testing.T) { testUserStoreGetByEmail(t, ss) })
 	t.Run("GetByAuthData", func(t *testing.T) { testUserStoreGetByAuthData(t, ss) })
 	t.Run("GetByUsername", func(t *testing.T) { testUserStoreGetByUsername(t, ss) })
@@ -1752,56 +1751,6 @@ func testUserStoreGetProfilesByUsernames(t *testing.T, ss store.Store) {
 		users, err := ss.User().GetProfilesByUsernames([]string{u1.Username, u3.Username}, &model.ViewUsersRestrictions{Teams: []string{team2Id}})
 		require.NoError(t, err)
 		assert.Equal(t, []*model.User{u3}, users)
-	})
-}
-
-func testUserStoreGetSystemAdminProfiles(t *testing.T, ss store.Store) {
-	teamId := model.NewId()
-
-	u1, err := ss.User().Save(&model.User{
-		Email:    MakeEmail(),
-		Roles:    model.SYSTEM_USER_ROLE_ID + " " + model.SYSTEM_ADMIN_ROLE_ID,
-		Username: "u1" + model.NewId(),
-	})
-	require.NoError(t, err)
-	defer func() { require.NoError(t, ss.User().PermanentDelete(u1.Id)) }()
-	_, nErr := ss.Team().SaveMember(&model.TeamMember{TeamId: teamId, UserId: u1.Id}, -1)
-	require.NoError(t, nErr)
-
-	u2, err := ss.User().Save(&model.User{
-		Email:    MakeEmail(),
-		Username: "u2" + model.NewId(),
-	})
-	require.NoError(t, err)
-	defer func() { require.NoError(t, ss.User().PermanentDelete(u2.Id)) }()
-	_, nErr = ss.Team().SaveMember(&model.TeamMember{TeamId: teamId, UserId: u2.Id}, -1)
-	require.NoError(t, nErr)
-
-	u3, err := ss.User().Save(&model.User{
-		Email:    MakeEmail(),
-		Roles:    model.SYSTEM_USER_ROLE_ID + " " + model.SYSTEM_ADMIN_ROLE_ID,
-		Username: "u3" + model.NewId(),
-	})
-	require.NoError(t, err)
-	defer func() { require.NoError(t, ss.User().PermanentDelete(u3.Id)) }()
-	_, nErr = ss.Team().SaveMember(&model.TeamMember{TeamId: teamId, UserId: u3.Id}, -1)
-	require.NoError(t, nErr)
-	_, nErr = ss.Bot().Save(&model.Bot{
-		UserId:   u3.Id,
-		Username: u3.Username,
-		OwnerId:  u1.Id,
-	})
-	require.NoError(t, nErr)
-	u3.IsBot = true
-	defer func() { require.NoError(t, ss.Bot().PermanentDelete(u3.Id)) }()
-
-	t.Run("all system admin profiles", func(t *testing.T) {
-		result, userError := ss.User().GetSystemAdminProfiles()
-		require.NoError(t, userError)
-		assert.Equal(t, map[string]*model.User{
-			u1.Id: sanitized(u1),
-			u3.Id: sanitized(u3),
-		}, result)
 	})
 }
 

@@ -382,7 +382,6 @@ type UserStore interface {
 	GetEtagForAllProfiles() string
 	GetEtagForProfiles(teamID string) string
 	UpdateFailedPasswordAttempts(userID string, attempts int) error
-	GetSystemAdminProfiles() (map[string]*model.User, error)
 	PermanentDelete(userID string) error
 	AnalyticsActiveCount(time int64, options model.UserCountOptions) (int64, error)
 	AnalyticsActiveCountForPeriod(startTime int64, endTime int64, options model.UserCountOptions) (int64, error)
